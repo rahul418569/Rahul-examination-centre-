@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSC MCQ Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #333;
+      --card: #ffffff;
+      --accent: #007bff;
+      --hover: #0056b3;
+    }
+    [data-theme="dark"] {
+      --bg: #121212;
+      --fg: #f5f5f5;
+      --card: #1e1e1e;
+      --accent: #4dabf7;
+      --hover: #228be6;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--fg);
+      scroll-behavior: smooth;
+      transition: background 0.3s, color 0.3s;
+    }
+    header {
+      background-color: #1e3a8a;
+      color: white;
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 0.5px;
+    }
+    header img {
+      height: 50px;
+    }
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .container {
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 40px;
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+      transition: background 0.3s;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 32px;
+      color: #1e3a8a;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      margin-top: 15px;
+    }
+    input[type="text"], input[type="date"] {
+      width: 100%;
+      padding: 14px;
+      margin-top: 5px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      background: #fdfdfd;
+      transition: border 0.2s ease;
+    }
+    input[type="text"]:focus, input[type="date"]:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+    .btn {
+      padding: 12px 24px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 16px;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+    .btn:hover {
+      background: var(--hover);
+      transform: scale(1.05);
+    }
+    .question {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .options label {
+      display: block;
+      margin-bottom: 10px;
+      padding: 14px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #f8f9fa;
+      cursor: pointer;
+      transition: background 0.3s ease, border 0.3s ease;
+    }
+    .options input {
+      margin-right: 10px;
+    }
+    .options label:hover, .options label.selected {
+      background: #e7f1ff;
+      border-color: #66b2ff;
+    }
+    #jump-box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 30px 0;
+      justify-content: center;
+    }
+    .jump-btn {
+      width: 44px;
+      height: 44px;
+      border: none;
+      border-radius: 50%;
+      background: #e4e4e4;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s;
+    }
+    .jump-btn:hover {
+      background: #c7c7c7;
+      transform: scale(1.1);
+    }
+    .seen {
+      background: #facc15 !important;
+      color: #000;
+    }
+    .answered {
+      background: #22c55e !important;
+      color: white;
+    }
+    #timer {
+      float: right;
+      font-size: 18px;
+      font-weight: bold;
+      color: #dc2626;
+    }
+    .progress-bar-container {
+      width: 100%;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      height: 14px;
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(to right, #38bdf8, #0ea5e9);
+      transition: width 0.3s ease-in-out;
+    }
+    .result-question {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .correct {
+      color: #16a34a;
+      font-weight: 600;
+    }
+    .wrong {
+      color: #dc2626;
+      font-weight: 600;
+    }
+    #downloadBtn {
+      display: block;
+      margin: 30px auto 0;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      padding: 14px 36px;
+      font-size: 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    #downloadBtn:hover {
+      background-color: #059669;
+    }
+    @media (max-width: 600px) {
+      .btn, #downloadBtn {
+        width: 100%;
+      }
+      .container {
+        margin: 20px;
+        padding: 20px;
+      }
+      header h1 {
+        font-size: 18px;
+      }
+      header img {
+        height: 36px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>SSC Exam Portal</h1>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Emblem_of_India.svg/64px-Emblem_of_India.svg.png" alt="Logo">
+</header>
+
+<button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+
+<div class="container" id="student-form">
+  <h2>Student Details</h2>
+  <label>Name:</label>
+  <input type="text" id="name">
+  <label>Roll Number:</label>
+  <input type="text" id="roll">
+  <label>Date of Birth:</label>
+  <input type="date" id="dob">
+  <button class="btn" onclick="startTest()">Start Test</button>
+</div>
+
+<div class="container" id="quiz-box" style="display:none;">
+  <h2>SSC MCQ Test <span id="timer"></span></h2>
+  <div id="jump-box"></div>
+  <div id="question-box"></div>
+  <div>
+    <button class="btn" onclick="prevQuestion()">Previous</button>
+    <button class="btn" onclick="nextQuestion()">Next</button>
+    <button class="btn" onclick="submitTest()">Submit</button>
+  </div>
+</div>
+
+<div class="container" id="result-box" style="display:none;">
+  <h2>Result</h2>
+  <div id="student-info"></div>
+  <div id="score-info"></div>
+  <div id="detailed-result"></div>
+  <button id="downloadBtn" onclick="downloadResult()">Download Result</button>
+</div>
+
+<script>
+  const questions = [
+    {
+      q: "भारत की राजधानी क्या है? / What is the capital of India?",
+      options: ["मुंबई / Mumbai", "दिल्ली / Delhi", "कोलकाता / Kolkata", "चेन्नई / Chennai"],
+      answer: "दिल्ली / Delhi"
+    },
+    {
+      q: "भारत के पहले प्रधानमंत्री कौन थे? / Who was the first Prime Minister of India?",
+      options: ["सुभाष चंद्र बोस / Subhas Chandra Bose", "महात्मा गांधी / Mahatma Gandhi", "जवाहरलाल नेहरू / Jawaharlal Nehru", "सरदार पटेल / Sardar Patel"],
+      answer: "जवाहरलाल नेहरू / Jawaharlal Nehru"
+    },
+    {
+      q: "गणराज्य दिवस कब मनाया जाता है? / When is Republic Day celebrated?",
+      options: ["15 अगस्त / 15th August", "26 जनवरी / 26th January", "2 अक्टूबर / 2nd October", "14 नवम्बर / 14th November"],
+      answer: "26 जनवरी / 26th January"
+    }
+  ];
+
+  let student = {};
+  let current = 0;
+  let userAnswers = Array(questions.length).fill(null);
+  let timerInterval;
+  let totalSeconds = 180;
+
+  function formatTime(sec) {
+    const minutes = String(Math.floor(sec / 60)).padStart(2, '0');
+    const seconds = String(sec % 60).padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+
+  function startCountdown() {
+    document.getElementById('timer').innerText = formatTime(totalSeconds);
+    timerInterval = setInterval(() => {
+      totalSeconds--;
+      document.getElementById('timer').innerText = formatTime(totalSeconds);
+      if (totalSeconds <= 0) {
+        clearInterval(timerInterval);
+        submitTest();
+      }
+    }, 1000);
+  }
+
+  function startTest() {
+    const name = document.getElementById("name").value.trim();
+    const roll = document.getElementById("roll").value.trim();
+    const dob = document.getElementById("dob").value;
+
+    if (!name || !roll || !dob) {
+      alert("Please fill all fields!");
+      return;
+    }
+
+    student = { name, roll, dob };
+
+    document.getElementById("student-form").style.display = "none";
+    document.getElementById("quiz-box").style.display = "block";
+
+    renderJumpBox();
+    loadQuestion();
+    startCountdown();
+  }
+   function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+    localStorage.setItem('theme', current === 'dark' ? 'light' : 'dark');
+  }
+  (function() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  })();
+
+  function renderJumpBox() {
+    const box = document.getElementById("jump-box");
+    box.innerHTML = "";
+    questions.forEach((_, i) => {
+      const btn = document.createElement("button");
+      btn.innerText = i + 1;
+      btn.className = "jump-btn";
+      btn.onclick = () => {
+        current = i;
+        loadQuestion();
+      };
+      box.appendChild(btn);
+    });
+    updateJumpBox();
+  }
+
+  function updateJumpBox() {
+    const btns = document.querySelectorAll(".jump-btn");
+    btns.forEach((btn, i) => {
+      btn.className = "jump-btn";
+      if (userAnswers[i]) btn.classList.add("answered");
+      else if (i <= current) btn.classList.add("seen");
+    });
+  }
+
+  function loadQuestion() {
+    updateJumpBox();
+    const qData = questions[current];
+    let html = `<div class="question">${current + 1}. ${qData.q}</div><div class="options">`;
+    qData.options.forEach(opt => {
+      const checked = userAnswers[current] === opt ? "checked" : "";
+      const selected = userAnswers[current] === opt ? "selected" : "";
+      html += `<label class="${selected}"><input type="radio" name="option" value="${opt}" ${checked}>${opt}</label>`;
+    });
+    html += `</div>`;
+    document.getElementById("question-box").innerHTML = html;
+
+    document.querySelectorAll("input[name='option']").forEach(input => {
+      input.addEventListener("change", saveAnswer);
+    });
+  }
+
+  function saveAnswer() {
+    const selected = document.querySelector("input[name='option']:checked");
+    if (selected) userAnswers[current] = selected.value;
+    updateJumpBox();
+  }
+
+  function nextQuestion() {
+    if (current < questions.length - 1) {
+      current++;
+      loadQuestion();
+    }
+  }
+
+  function prevQuestion() {
+    if (current > 0) {
+      current--;
+      loadQuestion();
+    }
+  }
+
+  function submitTest() {
+    saveAnswer();
+    clearInterval(timerInterval);
+
+    document.getElementById("quiz-box").style.display = "none";
+    document.getElementById("result-box").style.display = "block";
+
+    const correct = questions.filter((q, i) => q.answer === userAnswers[i]).length;
+
+    document.getElementById("student-info").innerHTML = `
+      <p><strong>Name:</strong> ${student.name}</p>
+      <p><strong>Roll Number:</strong> ${student.roll}</p>
+      <p><strong>Date of Birth:</strong> ${student.dob}</p>
+    `;
+
+    document.getElementById("score-info").innerHTML = `<p><strong>Score:</strong> ${correct} / ${questions.length}</p>`;
+
+    let resultHtml = "";
+    questions.forEach((q, i) => {
+      const selected = userAnswers[i] || "Not Answered";
+      const isCorrect = selected === q.answer;
+      resultHtml += `
+        <div class="result-question">
+          <strong>Q${i + 1}:</strong> ${q.q}<br>
+          <span class="${isCorrect ? 'correct' : 'wrong'}">Your Answer: ${selected}</span><br>
+          <span class="correct">Correct Answer: ${q.answer}</span>
+        </div>
+      `;
+    });
+
+    document.getElementById("detailed-result").innerHTML = resultHtml;
+  }
+
+  function downloadResult() {
+    const resultContent = document.getElementById("result-box").innerText;
+    const blob = new Blob([resultContent], { type: "text/plain;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `Result_${student.roll}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+</script>
+
+</body>
+</html>

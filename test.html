@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Real Exam Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f6fc;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    label {
+      font-weight: bold;
+    }
+    input[type="text"], input[type="date"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 20px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .btn {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .question {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    .options label {
+      display: block;
+      margin: 8px 0;
+      padding: 8px;
+      border-radius: 5px;
+      background: #f0f0f0;
+      cursor: pointer;
+    }
+    .options input {
+      margin-right: 10px;
+    }
+    #jump-box {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 20px 0;
+      gap: 8px;
+    }
+    .jump-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 5px;
+      background: #e0e0e0;
+      cursor: pointer;
+    }
+    .seen {
+      background: #ffc107;
+    }
+    .answered {
+      background: #28a745;
+      color: white;
+    }
+    .result-question {
+      margin: 15px 0;
+    }
+    .correct {
+      color: green;
+    }
+    .wrong {
+      color: red;
+    }
+    .download-btn {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="student-form">
+  <h2>Enter Student Details</h2>
+  <label>Name:</label>
+  <input type="text" id="name">
+  <label>Roll Number:</label>
+  <input type="text" id="roll">
+  <label>Date of Birth:</label>
+  <input type="date" id="dob">
+  <button class="btn" onclick="startTest()">Start Test</button>
+</div>
+
+<div class="container" id="quiz-box" style="display:none;">
+  <h2>MCQ Test</h2>
+  <div id="jump-box"></div>
+  <div id="question-box"></div>
+  <div>
+    <button class="btn" onclick="prevQuestion()">Previous</button>
+    <button class="btn" onclick="nextQuestion()">Next</button>
+    <button class="btn" onclick="submitTest()">Submit</button>
+  </div>
+</div>
+
+<div class="container" id="result-box" style="display:none;">
+  <h2>Result</h2>
+  <div id="student-info"></div>
+  <div id="score-info"></div>
+  <div id="detailed-result"></div>
+  <button class="btn download-btn" onclick="downloadResult()">Download Result</button>
+</div>
+
+<script>
+  const questions = [
+    {
+      q: "What is the capital of India?",
+      options: ["Mumbai", "Delhi", "Kolkata", "Chennai"],
+      answer: "Delhi"
+    },
+    {
+      q: "Who wrote the Indian Constitution?",
+      options: ["Gandhi", "Nehru", "Ambedkar", "Patel"],
+      answer: "Ambedkar"
+    },
+    {
+      q: "Which is the largest planet in our solar system?",
+      options: ["Earth", "Mars", "Jupiter", "Venus"],
+      answer: "Jupiter"
+    },
+    {
+      q: "What is the chemical symbol of water?",
+      options: ["H2O", "O2", "HO2", "H2"],
+      answer: "H2O"
+    },
+    {
+      q: "Which organ purifies blood in the human body?",
+      options: ["Heart", "Lungs", "Kidney", "Liver"],
+      answer: "Kidney"
+    }
+  ];
+
+  let student = {};
+  let current = 0;
+  let userAnswers = Array(questions.length).fill(null);
+
+  function startTest() {
+    const name = document.getElementById("name").value.trim();
+    const roll = document.getElementById("roll").value.trim();
+    const dob = document.getElementById("dob").value;
+
+    if (!name || !roll || !dob) {
+      alert("Please fill all fields!");
+      return;
+    }
+
+    student = { name, roll, dob };
+
+    document.getElementById("student-form").style.display = "none";
+    document.getElementById("quiz-box").style.display = "block";
+
+    renderJumpBox();
+    loadQuestion();
+  }
+
+  function renderJumpBox() {
+    const box = document.getElementById("jump-box");
+    box.innerHTML = "";
+    questions.forEach((_, i) => {
+      const btn = document.createElement("button");
+      btn.innerText = i + 1;
+      btn.className = "jump-btn";
+      btn.onclick = () => {
+        current = i;
+        loadQuestion();
+      };
+      box.appendChild(btn);
+    });
+  }
+
+  function updateJumpBox() {
+    const btns = document.querySelectorAll(".jump-btn");
+    btns.forEach((btn, i) => {
+      btn.className = "jump-btn";
+      if (userAnswers[i]) {
+        btn.classList.add("answered");
+      } else if (i <= current) {
+        btn.classList.add("seen");
+      }
+    });
+  }
+
+  function loadQuestion() {
+    updateJumpBox();
+    const qData = questions[current];
+    let html = `<div class="question">${current + 1}. ${qData.q}</div><div class="options">`;
+    qData.options.forEach(opt => {
+      const checked = userAnswers[current] === opt ? "checked" : "";
+      html += `
+        <label>
+          <input type="radio" name="option" value="${opt}" ${checked}>
+          ${opt}
+        </label>
+      `;
+    });
+    html += `</div>`;
+    document.getElementById("question-box").innerHTML = html;
+  }
+
+  function saveAnswer() {
+    const selected = document.querySelector('input[name="option"]:checked');
+    if (selected) userAnswers[current] = selected.value;
+  }
+
+  function nextQuestion() {
+    saveAnswer();
+    if (current < questions.length - 1) {
+      current++;
+      loadQuestion();
+    }
+  }
+
+  function prevQuestion() {
+    saveAnswer();
+    if (current > 0) {
+      current--;
+      loadQuestion();
+    }
+  }
+
+  function submitTest() {
+    saveAnswer();
+    if (!confirm("Are you sure you want to submit the test?")) return;
+
+    document.getElementById("quiz-box").style.display = "none";
+    document.getElementById("result-box").style.display = "block";
+
+    const correct = questions.filter((q, i) => q.answer === userAnswers[i]).length;
+
+    document.getElementById("student-info").innerHTML = `
+      <p><strong>Name:</strong> ${student.name}</p>
+      <p><strong>Roll Number:</strong> ${student.roll}</p>
+      <p><strong>Date of Birth:</strong> ${student.dob}</p>
+    `;
+
+    document.getElementById("score-info").innerHTML = `
+      <p><strong>Score:</strong> ${correct} / ${questions.length}</p>
+    `;
+
+    let resultHtml = "";
+    questions.forEach((q, i) => {
+      const selected = userAnswers[i] || "Not Answered";
+      const isCorrect = selected === q.answer;
+      resultHtml += `
+        <div class="result-question">
+          <strong>Q${i + 1}:</strong> ${q.q}<br>
+          <span class="${isCorrect ? 'correct' : 'wrong'}">Your Answer: ${selected}</span><br>
+          <span class="correct">Correct Answer: ${q.answer}</span>
+        </div>
+      `;
+    });
+
+    document.getElementById("detailed-result").innerHTML = resultHtml;
+  }
+
+  function downloadResult() {
+    let text = `Name: ${student.name}\nRoll: ${student.roll}\nDOB: ${student.dob}\n\n`;
+    let correct = 0;
+    questions.forEach((q, i) => {
+      const selected = userAnswers[i] || "Not Answered";
+      if (selected === q.answer) correct++;
+      text += `Q${i + 1}: ${q.q}\nYour Answer: ${selected}\nCorrect Answer: ${q.answer}\n\n`;
+    });
+    text += `Final Score: ${correct} / ${questions.length}`;
+
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "result.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+</script>
+
+</body>
+</html>
